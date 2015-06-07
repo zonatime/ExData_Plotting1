@@ -1,36 +1,17 @@
+# eda_assignment_1_plot2.R
 # Plot graph #2
 #
-# set up data frame to receive subset of full data file
-epc_data = data.frame(Date = character(), 
-                      Time = character(), 
-                      Global_active_power = numeric(), 
-                      Global_reactive_power = numeric(),
-                      Voltage = numeric(),
-                      Global_intensity = numeric(),
-                      Sub_metering_1 = numeric(),
-                      Sub_metering_2 = numeric(),
-                      Sub_metering_3 = numeric(),
-                      stringsAsFactors = FALSE)
+# source the data handling functions
+source("get_EPC_data.R")
 
-# open connection to raw data file (very large)
-conn <- file("household_power_consumption.txt", "r")
+# check for data, download and unzip if not present
+source_file = "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+dest_file = "exdata-data-household_power_consumption.zip"
+data_file = "household_power_consumption.txt"
+check_EPC_data(source_file, dest_file, data_file)
 
-# set counter for while loop
-# read 1 line at at time to test
-# if (2|3)/02/2007 write line to data frame 
-i=0
-while(length(line <- readLines(conn, 1)) > 0) {
-        ind <- grep("^(1|2)\\/2\\/2007", line)
-        if (length(ind)) {
-                vector = unlist(strsplit(line, ";"))
-                i=i+1
-                for (j in 1:2) epc_data[i,j] = as.character(vector[j])
-                for (j in 3:9) epc_data[i,j] = as.numeric(vector[j])
-        }
-}
-
-# close connection
-close(conn)
+# subset for "1/2/2007" and "2/2/2007"
+epc_data <- subset_EPC_data(data_file)
 
 # combine Date & Time; convert to DateTime value
 epc_data$DateTime <- paste(epc_data$Date, epc_data$Time)
